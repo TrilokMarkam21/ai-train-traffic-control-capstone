@@ -62,6 +62,12 @@ app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(morgan("dev"));
 
+// ─── Static Files (Frontend) ──────────────────────────────────────
+const path = require("path");
+// Try dist folder first, fallback to frontend-dist
+const distPath = path.join(__dirname, "../../dist") || path.join(__dirname, "../../frontend-dist");
+app.use(express.static(distPath));
+
 // ─── Config Endpoint — tells frontend the actual backend URL ────
 app.get("/api/config", async (req, res) => {
   const activePort = req.app.get("activePort") || process.env.PORT || 5000;
