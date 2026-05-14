@@ -71,6 +71,11 @@ const distPath1 = path.join(__dirname, "../../dist");
 const distPath2 = path.join(__dirname, "../../frontend-dist");
 const distPath = fs.existsSync(distPath1) ? distPath1 : distPath2;
 
+console.log("📁 Dist path 1:", distPath1, "exists:", fs.existsSync(distPath1));
+console.log("📁 Dist path 2:", distPath2, "exists:", fs.existsSync(distPath2));
+console.log("📁 Using dist path:", distPath);
+console.log("📁 Dist files:", fs.existsSync(distPath) ? fs.readdirSync(distPath) : "NO FILES");
+
 // Serve static files
 app.use(express.static(distPath));
 
