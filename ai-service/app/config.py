@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     
     # Server
     host: str = "0.0.0.0"
-    port: int = int(os.getenv("PORT", 8000))
+    port: int = int(os.getenv("PORT", 10000))
     
     # Model
     model_path: str = "model/train_model.pkl"
