@@ -64,8 +64,14 @@ app.use(morgan("dev"));
 
 // ─── Static Files (Frontend) ──────────────────────────────────────
 const path = require("path");
-// Try dist folder first, fallback to frontend-dist
-const distPath = path.join(__dirname, "../../dist") || path.join(__dirname, "../../frontend-dist");
+const fs = require("fs");
+
+// Determine dist path - check both possible locations
+const distPath1 = path.join(__dirname, "../../dist");
+const distPath2 = path.join(__dirname, "../../frontend-dist");
+const distPath = fs.existsSync(distPath1) ? distPath1 : distPath2;
+
+// Serve static files
 app.use(express.static(distPath));
 
 // ─── Config Endpoint — tells frontend the actual backend URL ────
@@ -129,12 +135,9 @@ app.use("/api/traffic", trafficControlRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
-app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "AI Train Traffic Control System API v2.0",
-    docs: "/api/health",
-  });
+// Fallback: serve index.html for all other routes (SPA routing)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
 });
 
 // ─── 404 Handler ──────────────────────────────────────────────
