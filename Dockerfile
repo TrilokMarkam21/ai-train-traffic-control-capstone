@@ -6,9 +6,14 @@ FROM node:18-alpine AS frontend-builder
 WORKDIR /build
 
 COPY frontend/package*.json ./
+COPY frontend/package-lock.json* ./
 RUN npm ci
 
-COPY frontend . .
+COPY frontend/src ./src
+COPY frontend/public ./public
+COPY frontend/*.config.* ./
+COPY frontend/tsconfig.json ./
+COPY frontend/index.html ./
 RUN npm run build
 
 # Stage 2: Install backend dependencies
