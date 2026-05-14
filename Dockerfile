@@ -10,9 +10,12 @@ RUN npm ci
 
 COPY frontend/src ./src
 COPY frontend/public ./public
-COPY frontend/*.config.* ./
 COPY frontend/tsconfig.json ./
+COPY frontend/tsconfig.app.json ./
+COPY frontend/tsconfig.node.json ./
+COPY frontend/vite.config.ts ./
 COPY frontend/index.html ./
+COPY frontend/eslint.config.js* ./
 RUN npm run build
 
 # Stage 2: Install backend dependencies
