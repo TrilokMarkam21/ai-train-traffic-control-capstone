@@ -64,18 +64,12 @@ app.use(morgan("dev"));
 
 // ─── Static Files (Frontend) ──────────────────────────────────────
 const path = require("path");
-const fs = require("fs");
 
-// Try dist first (from Docker build), fallback to public
-const distPath = path.join(__dirname, "../../../dist");
+// Serve all static files from public directory (includes React app)
 const publicPath = path.join(__dirname, "../public");
-const staticPath = fs.existsSync(distPath) && fs.readdirSync(distPath).length > 0 ? distPath : publicPath;
+console.log("📁 Serving static files from:", publicPath);
 
-console.log("📁 Dist path:", distPath, "exists:", fs.existsSync(distPath));
-console.log("📁 Using:", staticPath);
-
-// Serve static files
-app.use(express.static(staticPath));
+app.use(express.static(publicPath));
 
 // ─── Config Endpoint — tells frontend the actual backend URL ────
 app.get("/api/config", async (req, res) => {
