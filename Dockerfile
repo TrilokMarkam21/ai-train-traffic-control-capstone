@@ -4,19 +4,8 @@ FROM node:18-alpine AS frontend-builder
 
 WORKDIR /build
 
-COPY frontend/package*.json ./
-COPY frontend/package-lock.json* ./
-RUN npm ci
-
-COPY frontend/src ./src
-COPY frontend/public ./public
-COPY frontend/tsconfig.json ./
-COPY frontend/tsconfig.app.json ./
-COPY frontend/tsconfig.node.json ./
-COPY frontend/vite.config.ts ./
-COPY frontend/index.html ./
-COPY frontend/eslint.config.js* ./
-RUN npm run build
+COPY frontend/ .
+RUN npm ci && npm run build
 
 # Stage 2: Install backend dependencies
 FROM node:18-alpine AS backend-deps
