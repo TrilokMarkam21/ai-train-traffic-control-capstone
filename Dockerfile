@@ -1,14 +1,5 @@
 # AI Train Traffic Control - Backend Service with Frontend
-FROM node:18-alpine AS frontend-builder
 
-WORKDIR /build
-
-COPY frontend/ .
-RUN npm ci
-RUN npm run build
-RUN ls -la dist/ || echo "❌ Dist not found!"
-
-# Stage 2: Install backend dependencies
 FROM node:18-alpine AS backend-deps
 
 WORKDIR /app
@@ -16,7 +7,7 @@ WORKDIR /app
 COPY backend/package*.json ./
 RUN npm ci --only=production
 
-# Stage 3: Runtime
+# Runtime stage
 FROM node:18-alpine
 
 WORKDIR /app
@@ -30,11 +21,8 @@ COPY backend/src ./src
 COPY backend/scripts ./scripts
 COPY backend/server.js ./
 
-# Copy frontend dist - create if doesn't exist
-COPY --from=frontend-builder /build/dist ./dist
-
-# Ensure dist directory exists
-RUN mkdir -p dist
+# Copy pre-built frontend
+COPY frontend/dist ./dist
 
 EXPOSE 3000
 
