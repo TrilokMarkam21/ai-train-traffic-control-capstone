@@ -31,12 +31,26 @@ const app = express();
 // ─── Security Headers ─────────────────────────────────────────
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
 
-// ─── CORS — FIX: was `origin: true` (allows everyone) ────────
+// ─── CORS — allow any localhost port in dev (5173, 5174, etc.) ────
+const allowedOrigins = [
+  process.env.FRONTEND_URL || "http://localhost:5173",
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "http://localhost:3000",
+];
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      // Allow any localhost origin in development
+      if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS: origin '${origin}' not allowed`));
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   })
 );
 
@@ -70,11 +84,6 @@ const publicPath = path.join(__dirname, "../public");
 console.log("📁 Serving static files from:", publicPath);
 
 app.use(express.static(publicPath));
-
-// ─── SPA Catch-all (serve index.html for client-side routing) ────
-app.get("*", (req, res) => {
-  res.sendFile(path.join(publicPath, "index.html"));
-});
 
 // ─── Config Endpoint — tells frontend the actual backend URL ────
 app.get("/api/config", async (req, res) => {
@@ -136,6 +145,13 @@ app.use("/api/schedules", scheduleRoutes);
 app.use("/api/traffic", trafficControlRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
 app.use("/api/analytics", analyticsRoutes);
+
+// ─── SPA Catch-all (MUST be after all API routes) ─────────────
+// Only serve index.html for non-API routes so API calls are not swallowed
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/api/")) return next();
+  res.sendFile(path.join(publicPath, "index.html"));
+});
 
 // ─── 404 Handler ──────────────────────────────────────────────
 app.use((req, res) => {
