@@ -22,10 +22,10 @@ COPY backend/scripts ./scripts
 COPY backend/server.js ./
 COPY backend/public ./public
 
-# Verify and copy pre-built frontend if it exists
-RUN mkdir -p dist
-COPY frontend/dist ./dist 2>/dev/null || true
-RUN echo "Dist contents:" && ls -la dist/ || echo "dist/ is empty (using public fallback)"
+# Copy frontend dist files
+COPY frontend/dist ./dist
+
+RUN echo "✅ Docker build complete. Dist files:" && ls -la dist/
 
 EXPOSE 3000
 
