@@ -1,0 +1,16 @@
+node_modules
+.git
+.gitignore
+.vscode
+.DS_Store
+*.log
+.env.local
+.env.*.local
+.next
+out
+.cache
+.turbo
+.eslintcache
+frontend/node_modules
+ai-service/.venv
+ai-service/venv
