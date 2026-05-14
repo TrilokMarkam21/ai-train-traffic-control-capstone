@@ -1,6 +1,5 @@
 # AI Train Traffic Control - Backend Service with Frontend
-
-# Stage 1: Build frontend
+# Updated: Build frontend from source during Docker build
 FROM node:18-alpine AS frontend-builder
 
 WORKDIR /build
