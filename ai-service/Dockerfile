@@ -27,7 +27,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY app/ ./app/
-COPY model/ ./model/
+
+# Create model directory (models optional)
+RUN mkdir -p model
 
 # Create logs directory
 RUN mkdir -p logs
