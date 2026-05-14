@@ -21,8 +21,10 @@ COPY backend/src ./src
 COPY backend/scripts ./scripts
 COPY backend/server.js ./
 
-# Copy pre-built frontend
-COPY frontend/dist ./dist
+# Verify and copy pre-built frontend
+RUN echo "Checking for frontend/dist..." && ls -la frontend/ 2>&1 || echo "frontend/ not found"
+COPY frontend/dist ./dist || true
+RUN echo "Dist contents:" && ls -la dist/ || echo "dist/ empty or not found"
 
 EXPOSE 3000
 
