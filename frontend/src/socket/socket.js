@@ -43,8 +43,12 @@ async function initSocket() {
       console.log(`📌 Using cached backend URL: ${backendUrl}`);
     }
 
-    // Fallback
-    const socketUrl = backendUrl || import.meta.env.VITE_API_URL || "http://localhost:5000";
+    // In production: connect to same origin (frontend served from backend)
+    // In development: use discovered/cached backend URL or localhost fallback
+    const isProd = import.meta.env.PROD;
+    const socketUrl = isProd
+      ? (import.meta.env.VITE_API_URL || window.location.origin)
+      : (backendUrl || import.meta.env.VITE_API_URL || "http://localhost:5000");
     console.log(`🔌 Socket.IO connecting to: ${socketUrl}`);
 
     socket = io(socketUrl, {
