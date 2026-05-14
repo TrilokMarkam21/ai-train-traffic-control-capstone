@@ -1,28 +1,39 @@
-# AI Train Traffic Control - Backend Service
-# Railway will auto-detect this at the repo root
+# AI Train Traffic Control - Backend Service with Frontend
 
-FROM node:18-alpine AS deps
+# Stage 1: Build frontend
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /build
+
+COPY frontend/package*.json ./
+RUN npm ci
+
+COPY frontend . .
+RUN npm run build
+
+# Stage 2: Install backend dependencies
+FROM node:18-alpine AS backend-deps
 
 WORKDIR /app
 
 COPY backend/package*.json ./
-
 RUN npm ci --only=production
 
+# Stage 3: Runtime
 FROM node:18-alpine
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=backend-deps /app/node_modules ./node_modules
 
 COPY backend/package*.json ./
 COPY backend/src ./src
 COPY backend/scripts ./scripts
 COPY backend/server.js ./
 
-COPY frontend/dist ./dist
+COPY --from=frontend-builder /build/dist ./dist
 
 EXPOSE 3000
 
