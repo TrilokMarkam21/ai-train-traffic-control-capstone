@@ -71,6 +71,11 @@ console.log("📁 Serving static files from:", publicPath);
 
 app.use(express.static(publicPath));
 
+// ─── SPA Catch-all (serve index.html for client-side routing) ────
+app.get("*", (req, res) => {
+  res.sendFile(path.join(publicPath, "index.html"));
+});
+
 // ─── Config Endpoint — tells frontend the actual backend URL ────
 app.get("/api/config", async (req, res) => {
   const backendUrl =
@@ -131,11 +136,6 @@ app.use("/api/schedules", scheduleRoutes);
 app.use("/api/traffic", trafficControlRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
 app.use("/api/analytics", analyticsRoutes);
-
-// Fallback: serve index.html for all other routes (SPA routing)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(distPath, "index.html"));
-});
 
 // ─── 404 Handler ──────────────────────────────────────────────
 app.use((req, res) => {
