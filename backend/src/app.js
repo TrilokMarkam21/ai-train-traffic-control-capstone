@@ -66,15 +66,14 @@ app.use(morgan("dev"));
 const path = require("path");
 const fs = require("fs");
 
-// Determine dist path - check both possible locations
-const distPath1 = path.join(__dirname, "../../dist");
-const distPath2 = path.join(__dirname, "../../frontend-dist");
-const distPath = fs.existsSync(distPath1) ? distPath1 : distPath2;
+// Dist is at /app/dist in the container
+const distPath = path.join(__dirname, "../../../dist");
 
-console.log("📁 Dist path 1:", distPath1, "exists:", fs.existsSync(distPath1));
-console.log("📁 Dist path 2:", distPath2, "exists:", fs.existsSync(distPath2));
-console.log("📁 Using dist path:", distPath);
-console.log("📁 Dist files:", fs.existsSync(distPath) ? fs.readdirSync(distPath) : "NO FILES");
+console.log("📁 Dist path:", distPath);
+console.log("📁 Dist exists:", fs.existsSync(distPath));
+if (fs.existsSync(distPath)) {
+  console.log("📁 Dist files:", fs.readdirSync(distPath));
+}
 
 // Serve static files
 app.use(express.static(distPath));
