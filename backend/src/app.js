@@ -78,12 +78,15 @@ app.use(morgan("dev"));
 
 // ─── Static Files (Frontend) ──────────────────────────────────────
 const path = require("path");
+const fs = require("fs");
 
-// Serve all static files from public directory (includes React app)
+// Render build copies frontend/dist via build command; fall back to backend/public
+const distPath = path.join(__dirname, "../../frontend/dist");
 const publicPath = path.join(__dirname, "../public");
-console.log("📁 Serving static files from:", publicPath);
+const staticPath = fs.existsSync(distPath) ? distPath : publicPath;
+console.log("📁 Serving static files from:", staticPath);
 
-app.use(express.static(publicPath));
+app.use(express.static(staticPath));
 
 // ─── Config Endpoint — tells frontend the actual backend URL ────
 app.get("/api/config", async (req, res) => {
@@ -150,7 +153,7 @@ app.use("/api/analytics", analyticsRoutes);
 // Only serve index.html for non-API routes so API calls are not swallowed
 app.get("*", (req, res, next) => {
   if (req.path.startsWith("/api/")) return next();
-  res.sendFile(path.join(publicPath, "index.html"));
+  res.sendFile(path.join(staticPath, "index.html"));
 });
 
 // ─── 404 Handler ──────────────────────────────────────────────

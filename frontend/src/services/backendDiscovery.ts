@@ -1,11 +1,16 @@
 /**
  * Backend Discovery Service
- * Automatically detects the backend URL by trying common ports
- * and fetching the /api/config endpoint
+ *
+ * - In PRODUCTION: the frontend is served from the same Express server,
+ *   so all API calls use relative paths (empty string = same origin).
+ *   No port scanning needed.
+ *
+ * - In DEVELOPMENT: scans common localhost ports to find the backend.
  */
 
-const COMMON_PORTS = [5000, 5001, 5002, 5003, 5004, 5005, 8000, 8001, 3000, 3001];
-const TIMEOUT = 2000; // 2 seconds per attempt
+const IS_PROD = import.meta.env.PROD; // true when built by Vite for production
+const COMMON_PORTS = [5000, 5001, 5002, 5003, 5004, 5005, 8000, 3000, 3001];
+const TIMEOUT = 2000;
 
 async function checkBackendOnPort(port: number): Promise<string | null> {
   try {
@@ -16,54 +21,47 @@ async function checkBackendOnPort(port: number): Promise<string | null> {
         setTimeout(() => reject(new Error("timeout")), TIMEOUT)
       ),
     ]);
-
     if (response.ok) {
-      const data = await response.json();
-      console.log(`✅ Backend found on port ${port}:`, data.data);
+      console.log(`✅ Backend found on port ${port}`);
       return `http://localhost:${port}`;
     }
-  } catch (error) {
-    // Port not available, continue to next
+  } catch {
+    // Port not available, try next
   }
   return null;
 }
 
 async function discoverBackendUrl(): Promise<string> {
-  console.log("🔍 Discovering backend URL...");
+  // ── PRODUCTION: same-origin, use relative paths ──────────────
+  if (IS_PROD || import.meta.env.VITE_API_URL) {
+    const url = import.meta.env.VITE_API_URL || "";
+    console.log(`🚀 Production mode — backend URL: "${url || "(relative)"}"`);
+    localStorage.setItem("backendUrl", url);
+    return url;
+  }
 
-  // Try each common port
+  // ── DEVELOPMENT: scan localhost ports ─────────────────────────
+  console.log("🔍 Discovering backend URL...");
   for (const port of COMMON_PORTS) {
     const backendUrl = await checkBackendOnPort(port);
     if (backendUrl) {
-      console.log(`🎉 Backend discovered at ${backendUrl}`);
       localStorage.setItem("backendUrl", backendUrl);
       return backendUrl;
     }
   }
 
-  // Fallback to environment variable
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl) {
-    console.log(`📝 Using VITE_API_URL from .env: ${envUrl}`);
-    return envUrl;
-  }
-
-  // Ultimate fallback
   const fallback = "http://localhost:5000";
   console.warn(`⚠️  Could not discover backend. Using fallback: ${fallback}`);
   return fallback;
 }
 
 export function getBackendUrl(): string {
-  // Check if we have a stored URL
-  const stored = localStorage.getItem("backendUrl");
-  if (stored) {
-    console.log(`📌 Using stored backend URL: ${stored}`);
-    return stored;
+  // In production, use relative paths (empty string = same origin)
+  if (IS_PROD) {
+    return import.meta.env.VITE_API_URL || "";
   }
-
-  // Return env or fallback (discovery happens on app init)
-  return import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const stored = localStorage.getItem("backendUrl");
+  return stored || import.meta.env.VITE_API_URL || "http://localhost:5000";
 }
 
 export { discoverBackendUrl };
