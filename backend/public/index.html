@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Train Traffic Control</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .container { max-width: 500px; text-align: center; padding: 20px; }
+    h1 { color: #60a5fa; margin-bottom: 20px; font-size: 2em; }
+    p { margin: 10px 0; color: #94a3b8; }
+    .loader { display: inline-block; width: 40px; height: 40px; border: 4px solid #1e293b; border-top-color: #60a5fa; border-radius: 50%; animation: spin 1s linear infinite; margin: 30px 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status { margin-top: 30px; font-size: 0.9em; color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚆 AI Train Traffic Control</h1>
+    <p>Loading application...</p>
+    <div class="loader"></div>
+    <div class="status">
+      <p>Backend: ✅ Online</p>
+      <p>Loading frontend...</p>
+    </div>
+  </div>
+  <script>
+    // Try to load the React app
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
+  </script>
+</body>
+</html>

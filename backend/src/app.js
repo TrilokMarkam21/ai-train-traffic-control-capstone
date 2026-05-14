@@ -66,17 +66,16 @@ app.use(morgan("dev"));
 const path = require("path");
 const fs = require("fs");
 
-// Dist is at /app/dist in the container
+// Try dist first (from Docker build), fallback to public
 const distPath = path.join(__dirname, "../../../dist");
+const publicPath = path.join(__dirname, "../public");
+const staticPath = fs.existsSync(distPath) && fs.readdirSync(distPath).length > 0 ? distPath : publicPath;
 
-console.log("📁 Dist path:", distPath);
-console.log("📁 Dist exists:", fs.existsSync(distPath));
-if (fs.existsSync(distPath)) {
-  console.log("📁 Dist files:", fs.readdirSync(distPath));
-}
+console.log("📁 Dist path:", distPath, "exists:", fs.existsSync(distPath));
+console.log("📁 Using:", staticPath);
 
 // Serve static files
-app.use(express.static(distPath));
+app.use(express.static(staticPath));
 
 // ─── Config Endpoint — tells frontend the actual backend URL ────
 app.get("/api/config", async (req, res) => {

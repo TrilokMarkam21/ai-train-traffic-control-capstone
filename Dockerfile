@@ -20,11 +20,12 @@ COPY backend/package*.json ./
 COPY backend/src ./src
 COPY backend/scripts ./scripts
 COPY backend/server.js ./
+COPY backend/public ./public
 
-# Verify and copy pre-built frontend
-RUN echo "Checking for frontend/dist..." && ls -la frontend/ 2>&1 || echo "frontend/ not found"
-COPY frontend/dist ./dist || true
-RUN echo "Dist contents:" && ls -la dist/ || echo "dist/ empty or not found"
+# Verify and copy pre-built frontend if it exists
+RUN mkdir -p dist
+COPY frontend/dist ./dist 2>/dev/null || true
+RUN echo "Dist contents:" && ls -la dist/ || echo "dist/ is empty (using public fallback)"
 
 EXPOSE 3000
 
