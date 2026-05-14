@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     model_path: str = "model/train_model.pkl"
     
     # CORS
-    cors_origins: list = ["http://localhost:5173", "http://localhost:3000"]
+    cors_origins: str = "http://localhost:5173,http://localhost:3000"
     
     # API
     api_prefix: str = "/v1"
@@ -70,7 +70,8 @@ class AppConfig:
         if self.settings.debug:
             return ["*"]
 
-        return self.settings.cors_origins
+        # Parse default string
+        return [origin.strip() for origin in self.settings.cors_origins.split(",")]
 
 
 # Global configuration instance
